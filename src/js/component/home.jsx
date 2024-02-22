@@ -1,24 +1,50 @@
-import React from "react";
-
-//include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
+import React, { useState, useEffect } from "react";
 
 //create your first component
+
+
 const Home = () => {
+
+	const [ charactersNumber, setCharacterNumber] = useState(0)
+	const [page, setPage] = useState(85)
+
+	// onLoad
+	useEffect(()=>{
+
+		// GET
+		fetch(`https://narutodb.xyz/api/character?page=${page}&limit=5`)
+
+			.then( resp => {
+				return resp.json() // Response ->  Promise
+			})
+			
+			.then( info  => {
+				console.log(info) // Objeto JS
+				setNarutoCharacters(info.characters)
+				setCharacterNumber(info.totalCharacters)
+			})
+
+			.catch( error => {
+				console.log(error)
+			})
+
+	},[page])
+
+
+	const [ narutoCharacters, setNarutoCharacters] = useState([])
+
 	return (
-		<div className="text-center">
-			<h1 className="text-center mt-5">Hello Rigo!</h1>
-			<p>
-				<img src={rigoImage} />
-			</p>
-			<a href="#" className="btn btn-success">
-				If you see this green button... bootstrap is working...
-			</a>
-			<p>
-				Made by{" "}
-				<a href="http://www.4geeksacademy.com">4Geeks Academy</a>, with
-				love!
-			</p>
+		<div className="d-flex flex-column justify-content-center align-items-center min-vh-100">
+			<h1>Characters {charactersNumber}!</h1>
+			<button onClick={() => setPage(page + 1)}> Next </button>
+			{
+				narutoCharacters.map(( person )=> <div key={person.id}>
+					<img src={person.images[0]} alt={person.name} style={{ width: '180px'}} />
+					<p>
+						{person.name}
+					</p>
+				</div>)
+			}
 		</div>
 	);
 };
